@@ -1,14 +1,9 @@
 ﻿using ChatServer.Net.IO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatServer
 {
-    internal class Client
+    class Client
     {
         public string Username { get; set; }
         public Guid UID { get; set; }
@@ -23,8 +18,33 @@ namespace ChatServer
             var opcode = _packetReader.ReadByte();
             Username = _packetReader.ReadMessage();
 
-
-            Console.WriteLine(String.Format("User '{0}' has conneted at '{1}'", Username, DateTime.Now));
+            Task.Run(() => ProcessPackets());
+        }
+        void ProcessPackets()
+        {
+            while(true) 
+            {
+                try
+                {
+                    var opcode = _packetReader.ReadByte();
+                    switch(opcode) 
+                    {
+                        case 5:
+                            var message = _packetReader.ReadMessage();
+                            Program.BroadcastMessage(message, UID.ToString());
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch(Exception e) 
+                {
+                    Program.BroadcastDisconnect(UID.ToString());
+                    Program.BroadcastAnnoucment($"User [{Username}] has Disconnected");
+                    ClientSocket.Close();
+                    break;
+                } 
+            }
         }
     }
 }

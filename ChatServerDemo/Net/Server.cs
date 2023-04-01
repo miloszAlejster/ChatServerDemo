@@ -1,9 +1,6 @@
 ﻿using ChatClient.Net.IO;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ChatClient.Net
@@ -14,6 +11,8 @@ namespace ChatClient.Net
         public PacketBuilder connectPacket;
         public PacketReader packetRader;
         public event Action connectedEvent;
+        public event Action messageReceivedEvent;
+        public event Action disconnectEvent;
 
         public Server()
         {
@@ -49,12 +48,28 @@ namespace ChatClient.Net
                         case 1:
                             connectedEvent?.Invoke();
                             break;
+                        case 5:
+                            messageReceivedEvent?.Invoke();
+                            break;
+                        case 6:
+                            messageReceivedEvent?.Invoke();
+                            break;
+                        case 10:
+                            disconnectEvent?.Invoke();
+                            break;
                         default:
                             Console.WriteLine("Reading err");
                             break;
                     }
                 }
             });
+        }
+        public void SendMessageToServer(string message) 
+        {
+            var packet = new PacketBuilder();
+            packet.WriteOPCode(5);
+            packet.WriteMessage(message);
+            _client.Client.Send(packet.GetPacketBytes());
         }
     }
 }
