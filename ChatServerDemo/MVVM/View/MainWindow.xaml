@@ -3,27 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ChatServerDemo"
+        xmlns:local="clr-namespace:ChatServerDemo" xmlns:viewmodel="clr-namespace:ChatClient.MVVM.ViewModel"
         mc:Ignorable="d"
         ResizeMode="NoResize"
-        Title="MainWindow" Height="475" Width="815">
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <viewmodel:MainViewModel />
+    </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="180"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <DockPanel>
             <TextBox Height="25"
-                     DockPanel.Dock="Top"/>
+                     DockPanel.Dock="Top"
+                     Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Height="25"
                     DockPanel.Dock="Top"
-                    Content="Connect"/>
-            <ListView />
+                    Content="Connect"
+                    Command="{Binding ConnectToServerCommand}"/>
+            <ListView ItemsSource="{Binding Users}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Username}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </DockPanel>
 
         <StackPanel Grid.Column="1">
-            <ListView Height="380"/>
+            <ListView Height="300"/>
 
             <StackPanel Orientation="Horizontal">
                 <TextBox Height="55"
